@@ -3,26 +3,11 @@
  *  Prepared for ThingsBoard server.
  */
 
-#include "DHT.h"
+#include <DHT.h>
 #include <PubSubClient.h>
 #include <ESP8266WiFi.h>
 
-// WiFi settings
-#define WIFI_SSID "HOMENET"
-#define WIFI_PASSWORD "2TarElka"
-
-// DHT sensor settings
-#define DHT_PIN 4 // LoLin pin D2
-#define DHT_TYPE DHT22
-
-// ThingsBoard server settings
-char THINGSBOARD_HOST[] = "192.168.1.101";
-#define THINGSBOARD_PORT 1883
-
-// ThingsBoard device settings
-#define THINGSBOARD_DEVICE_ID "Hall sensor"
-#define THINGSBOARD_DEVICE_TOKEN "UvYkk1TcD3xZcWOMPw0p"
-#define THINGSBOARD_DEVICE_TELEMETRY_REFRESH 5000 // milliseconds
+#include "Configuration.h"
 
 WiFiClient wifiClient;
 
