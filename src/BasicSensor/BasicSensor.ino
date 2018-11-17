@@ -21,20 +21,18 @@ PubSubClient mqttClient(wifiClient);
 int status = WL_IDLE_STATUS;
 unsigned long lastTelemetrySend;
 
-void setup()
-{
+void setup() {
   Serial.begin(SERIAL_BAUDRATE);
   dhtSensor.begin();
   delay(10);
-  InitWiFi();
-  mqttClient.setServer(THINGSBOARD_HOST, THINGSBOARD_PORT);
+  InitializeWiFi();
+  InitializeMqtt(-1);
   lastTelemetrySend = 0;
 }
 
-void loop()
-{
+void loop() {
   if (!mqttClient.connected()) {
-    reconnect();
+    Reconnect();
   }
 
   // Update and send telemetry.
@@ -51,8 +49,7 @@ void loop()
   mqttClient.loop();
 }
 
-SensorTelemetry ReadSensorTelemetry()
-{
+SensorTelemetry ReadSensorTelemetry() {
   // Reading temperature or humidity takes about 250 milliseconds!
   float humidity = dhtSensor.readHumidity();
   // Read temperature as Celsius (the default)
@@ -62,8 +59,7 @@ SensorTelemetry ReadSensorTelemetry()
   return SensorTelemetry(temperature, humidity, heatIndex);
 }
 
-void SendTelemetry(SensorTelemetry telemetry)
-{
+void SendTelemetry(SensorTelemetry telemetry) {
   Serial.print("Temperature: ");
   Serial.print(telemetry.Temperature);
   Serial.print(" *C\t");
@@ -86,42 +82,41 @@ void SendTelemetry(SensorTelemetry telemetry)
   Serial.println(attributes);
 }
 
-void InitWiFi()
-{
-  Serial.println("Connecting to AP ...");
-  // attempt to connect to WiFi network
-
+void InitializeWiFi() {
+  Serial.println("Connecting to WiFi network ...");
+  
   WiFi.mode(WIFI_STA);
   WiFi.begin(WIFI_SSID, WIFI_PASSWORD);
   while (WiFi.status() != WL_CONNECTED) {
     delay(500);
     Serial.print(".");
   }
-  Serial.println("Connected to AP");
+  Serial.println("Connected to WiFi network");
 }
 
-void reconnect() {
+void InitializeMqtt(int reconnectDelay) {
+  mqttClient.setServer(THINGSBOARD_HOST, THINGSBOARD_PORT);
+  Serial.print("Connecting to ThingsBoard node ...");
+  // Attempt to connect (clientId, username, password)
+  if (mqttClient.connect(THINGSBOARD_DEVICE_ID, THINGSBOARD_DEVICE_TOKEN, NULL)) {
+    Serial.println(" [DONE]");
+  } else {
+    Serial.print(" [FAILED] [ state = ");
+    Serial.print(mqttClient.state());
+    Serial.println(" ]");
+    if (reconnectDelay > 0) {
+      delay(reconnectDelay);
+    }
+  }
+}
+
+void Reconnect() {
   // Loop until we're reconnected
   while (!mqttClient.connected()) {
     status = WiFi.status();
     if (status != WL_CONNECTED) {
-      WiFi.begin(WIFI_SSID, WIFI_PASSWORD);
-      while (WiFi.status() != WL_CONNECTED) {
-        delay(500);
-        Serial.print(".");
-      }
-      Serial.println("Connected to AP");
+      InitializeWiFi();
     }
-    Serial.print("Connecting to ThingsBoard node ...");
-    // Attempt to connect (clientId, username, password)
-    if (mqttClient.connect(THINGSBOARD_DEVICE_ID, THINGSBOARD_DEVICE_TOKEN, NULL)) {
-      Serial.println("[DONE]");
-    } else {
-      Serial.print("[FAILED] [ rc = ");
-      Serial.print(mqttClient.state());
-      Serial.println(" : retrying in 5 seconds]");
-      // Wait 5 seconds before retrying
-      delay(5000);
-    }
+    InitializeMqtt(5000);
   }
 }
