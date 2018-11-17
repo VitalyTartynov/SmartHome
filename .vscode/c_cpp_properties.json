@@ -3,11 +3,13 @@
         {
             "name": "Win32",
             "includePath": [
+                "${workspaceFolder}\\**",
                 "C:\\Users\\TartunovVA\\AppData\\Local\\Arduino15\\packages\\esp8266\\tools\\**",
                 "C:\\Users\\TartunovVA\\AppData\\Local\\Arduino15\\packages\\esp8266\\hardware\\esp8266\\2.3.0\\**",
                 "C:\\Users\\TartunovVA\\Documents\\Arduino\\libraries\\**"
             ],
             "forcedInclude": [],
+            "defines": [ "ARDUINO=100"],
             "intelliSenseMode": "msvc-x64",
             "compilerPath": "C:/Program Files (x86)/Microsoft Visual Studio/2017/BuildTools/VC/Tools/MSVC/14.15.26726/bin/Hostx64/x64/cl.exe",
             "cStandard": "c11",
