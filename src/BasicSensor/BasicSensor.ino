@@ -1,6 +1,6 @@
 /*
- *  This sketch for basic temperature and humidity sensor.
- *  Prepared for ThingsBoard server.
+ This sketch for basic temperature and humidity sensor.
+ Prepared for ThingsBoard server.
  */
 
 #include <DHT.h>
