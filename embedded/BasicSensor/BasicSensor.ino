@@ -64,30 +64,27 @@ void getAndSendTemperatureAndHumidityData()
   Serial.println("Collecting sensors telemetry.");
 
   // Reading temperature or humidity takes about 250 milliseconds!
-  float h = dht.readHumidity();
+  float humidity = dht.readHumidity();
   // Read temperature as Celsius (the default)
-  float t = dht.readTemperature();
+  float temperature = dht.readTemperature();
 
   // Check if any reads failed and exit early (to try again).
-  if (isnan(h) || isnan(t)) {
+  if (isnan(humidity) || isnan(temperature)) {
     Serial.println("Failed to read from DHT sensor!");
     return;
   }
 
-  float heatIndex = dht.computeHeatIndex(t, h, false);
+  float heatIndex = dht.computeHeatIndex(temperature, humidity, false);
 
   Serial.print("Temperature: ");
-  Serial.print(t);
+  Serial.print(temperature);
   Serial.print(" *C\t");
   Serial.print("Humidity: ");
-  Serial.print(h);
+  Serial.print(humidity);
   Serial.print(" %\t");
   Serial.print("Heat index: ");
   Serial.print(heatIndex);
   Serial.print(" \t");
-
-  String temperature = String(t);
-  String humidity = String(h);
 
   Serial.print("  -> ");
 
