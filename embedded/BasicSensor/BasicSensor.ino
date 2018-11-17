@@ -74,12 +74,17 @@ void getAndSendTemperatureAndHumidityData()
     return;
   }
 
+  float heatIndex = dht.computeHeatIndex(t, h, false);
+
   Serial.print("Temperature: ");
   Serial.print(t);
   Serial.print(" *C\t");
   Serial.print("Humidity: ");
   Serial.print(h);
-  Serial.print(" % ");
+  Serial.print(" %\t");
+  Serial.print("Heat index: ");
+  Serial.print(heatIndex);
+  Serial.print(" \t");
 
   String temperature = String(t);
   String humidity = String(h);
@@ -89,7 +94,8 @@ void getAndSendTemperatureAndHumidityData()
   // Prepare a JSON payload string
   String payload = "{";
   payload += "\"Temperature\":"; payload += temperature; payload += ",";
-  payload += "\"Humidity\":"; payload += humidity;
+  payload += "\"Humidity\":"; payload += humidity; payload += ",";
+  payload += "\"HeatIndex\":"; payload += heatIndex;
   payload += "}";
 
   // Send payload
