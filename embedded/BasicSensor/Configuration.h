@@ -1,3 +1,6 @@
+// Serial settings
+#define SERIAL_BAUDRATE 115200
+
 // WiFi settings
 #define WIFI_SSID "YOURSSID"
 #define WIFI_PASSWORD "YOURPASSWORD"

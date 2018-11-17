@@ -7,6 +7,7 @@
 #include <PubSubClient.h>
 #include <ESP8266WiFi.h>
 
+#include "SensorTelemetry.h"
 #include "Configuration.h"
 
 WiFiClient wifiClient;
@@ -22,7 +23,7 @@ unsigned long lastTelemetrySend;
 
 void setup()
 {
-  Serial.begin(115200);
+  Serial.begin(SERIAL_BAUDRATE);
   dhtSensor.begin();
   delay(10);
   InitWiFi();
@@ -38,46 +39,45 @@ void loop()
 
   // Update and send telemetry.
   if (millis() - lastTelemetrySend > THINGSBOARD_DEVICE_TELEMETRY_REFRESH) {
-    getAndSendTemperatureAndHumidityData();
+    SensorTelemetry telemetry = ReadSensorTelemetry();
+    if (!telemetry.IsFailed) {
+      SendTelemetry(telemetry);
+    } else {
+      Serial.println("Failed to read telemetry from DHT sensor!");
+    }
     lastTelemetrySend = millis();
   }
 
   mqttClient.loop();
 }
 
-void getAndSendTemperatureAndHumidityData()
+SensorTelemetry ReadSensorTelemetry()
 {
   // Reading temperature or humidity takes about 250 milliseconds!
   float humidity = dhtSensor.readHumidity();
   // Read temperature as Celsius (the default)
   float temperature = dhtSensor.readTemperature();
-
-  // Check if any reads failed and exit early (to try again).
-  if (isnan(humidity) || isnan(temperature)) {
-    Serial.println("Failed to read telemetry from DHT sensor!");
-    return;
-  }
-
   float heatIndex = dhtSensor.computeHeatIndex(temperature, humidity, false);
 
+  return SensorTelemetry(temperature, humidity, heatIndex);
+}
+
+void SendTelemetry(SensorTelemetry telemetry)
+{
   Serial.print("Temperature: ");
-  Serial.print(temperature);
+  Serial.print(telemetry.Temperature);
   Serial.print(" *C\t");
   Serial.print("Humidity: ");
-  Serial.print(humidity);
+  Serial.print(telemetry.Humidity);
   Serial.print(" %\t");
   Serial.print("Heat index: ");
-  Serial.print(heatIndex);
+  Serial.print(telemetry.HeatIndex);
   Serial.print(" \t");
 
   Serial.print("  -> ");
 
   // Prepare a JSON payload string
-  String payload = "{";
-  payload += "\"Temperature\":"; payload += temperature; payload += ",";
-  payload += "\"Humidity\":"; payload += humidity; payload += ",";
-  payload += "\"HeatIndex\":"; payload += heatIndex;
-  payload += "}";
+  String payload = telemetry.JsonSerialize();
 
   // Send payload
   char attributes[100];
