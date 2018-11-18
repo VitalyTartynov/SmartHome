@@ -56,7 +56,7 @@ SensorTelemetry ReadSensorTelemetry() {
   float temperature = dhtSensor.readTemperature();
   float heatIndex = dhtSensor.computeHeatIndex(temperature, humidity, false);
 
-  return SensorTelemetry(temperature, humidity, heatIndex);
+  return SensorTelemetry(temperature, humidity, heatIndex, WiFi.RSSI());
 }
 
 void SendTelemetry(SensorTelemetry telemetry) {
@@ -68,6 +68,10 @@ void SendTelemetry(SensorTelemetry telemetry) {
   Serial.print(" %\t");
   Serial.print("Heat index: ");
   Serial.print(telemetry.HeatIndex);
+  Serial.print(" \t");
+
+  Serial.print("RSSI: ");
+  Serial.print(WiFi.RSSI());
   Serial.print(" \t");
 
   Serial.print("  -> ");
@@ -111,7 +115,6 @@ void InitializeMqtt(int reconnectDelay) {
 }
 
 void Reconnect() {
-  // Loop until we're reconnected
   while (!mqttClient.connected()) {
     status = WiFi.status();
     if (status != WL_CONNECTED) {

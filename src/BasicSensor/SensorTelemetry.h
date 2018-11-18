@@ -4,19 +4,21 @@ class SensorTelemetry {
         float Temperature;
         float Humidity;
         float HeatIndex;
+        int RSSI;
 
     SensorTelemetry()
     {
-        Temperature = Humidity = HeatIndex = 0;
+        Temperature = Humidity = HeatIndex = RSSI = 0;
     }
 
-    SensorTelemetry(float temperature, float humidity, float heatIndex)
+    SensorTelemetry(float temperature, float humidity, float heatIndex, int rssi)
     {
         Temperature = temperature;
         Humidity = humidity;
         HeatIndex = heatIndex;
+        RSSI = rssi;
         
-        if (isnan(Temperature) || isnan(Humidity) || isnan(HeatIndex)) {
+        if (isnan(Temperature) || isnan(Humidity) || isnan(HeatIndex) || isnan(RSSI)) {
             IsFailed = true;
         }
     }
@@ -26,7 +28,8 @@ class SensorTelemetry {
         String payload = "{";
         payload += "\"Temperature\":"; payload += Temperature; payload += ",";
         payload += "\"Humidity\":"; payload += Humidity; payload += ",";
-        payload += "\"HeatIndex\":"; payload += HeatIndex;
+        payload += "\"HeatIndex\":"; payload += HeatIndex; payload += ",";
+        payload += "\"RSSI\":"; payload += RSSI;
         payload += "}";
 
         return payload;
